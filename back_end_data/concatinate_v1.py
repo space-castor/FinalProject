@@ -24,7 +24,8 @@ mapping = gpd.read_file("/Users/CassidyRecker/Desktop/github/FinalProject/back_e
 #print(mapping.columns)
 denver_data = mapping[mapping["city"] == "Denver"]
 denver_grades = denver_data[["grade", "GEOID10"]].dropna().drop_duplicates()
-denver_grades["GEOID10"] = denver_grades["GEOID10"].str[1:]
+denver_grades["GEOID10"] = denver_grades["GEOID10"].str[1:].astype(int)
+denver_grades = denver_grades.sort_values(by='TRACTFIPS')
 #denver_grades["GEOID"] = denver_grades['GEOID'].astype(str)
 #denver_grades["GEOID"] = denver_grades["GEOID"][1:]
 #denver_grades["GEOID"] = denver_grades['GEOID'].astype(int)
