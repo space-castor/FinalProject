@@ -9,7 +9,7 @@ import seaborn as sns
 
 ##pulling the mapping_inequality data###
 #mapping inequality
-mapping = gpd.read_file("/Users/CassidyRecker/Desktop/github/FinalProject/back_end_data/mapping_inequality/MIv3Areas_2020TractCrosswalk.geojson")
+mapping = gpd.read_file("mapping_inequality/MIv3Areas_2020TractCrosswalk.geojson")
 #making a data that just holds the GEOID and grades for the redlined data
 colorado_grades = mapping[["grade", "GEOID"]].dropna().drop_duplicates()
 #dropping extra 0s from front
