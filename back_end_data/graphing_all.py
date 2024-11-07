@@ -26,8 +26,33 @@ for index in range (1, len(files)):
 
 ###mapping data###
 values = ["grade", "GEOID"]
-mapping = gpd.read_file("mapping_inequality/MIv3Areas_2020TractCrosswalk.geojson")
+mapping_data = gpd.read_file("mapping_inequality/MIv3Areas_2020TractCrosswalk.geojson")
 #making a data that just holds the GEOID and grades for the redlined data
-colorado_grades = mapping[values].dropna().drop_duplicates()
+mapping_data = mapping_data[values].dropna().drop_duplicates()
 #dropping extra 0s from front
-colorado_grades["GEOID"] = colorado_grades["GEOID"].str[1:].astype(int)
+mapping_data["GEOID"] = mapping_data["GEOID"].str[1:].astype(int)
+#making list of grades only include grades
+'''
+#https://stackoverflow.com/questions/27965295/dropping-rows-from-dataframe-based-on-a-not-in-condition
+print(grades["grade"].value_counts(normalize=True))
+going to drop them because they make less than 2% of data
+'''
+grades_list = ['A','B','C','D']
+mapping_data = mapping_data[mapping_data['grade'].isin(grades_list)]
+
+###Making Concatinated version###
+#making geoid and TRACTFIPS "area"
+risks = fema_data.rename(columns={"TRACTFIPS": "area"})
+print("risk shape")
+print(risks.shape)
+grades = mapping_data.rename(columns={"GEOID": "area"}).dropna()
+print("grades shape")
+print(grades.shape)
+
+overall = pd.merge(grades, risks, on="area")
+#print(overall['grade'])
+
+print(overall.shape)
+sns.violinplot(data=overall, x="RISK_VALUE", y="grade")
+
+plt.show()
