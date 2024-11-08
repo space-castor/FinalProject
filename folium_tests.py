@@ -12,11 +12,20 @@ testmap = folium.Map(tiles="cartodb positron")
 
 redlining_data = "mappinginequality.json"
 
-#print(gjf["grade"])
+# print(gjf["grade"])
 for i in range( len( gjf["geometry"] ) ):
     zone = gjf["geometry"][i]
     grade_color = gjf["fill"][i]
-    folium.GeoJson(zone, color=grade_color, weight=1, fill_opacity=0.5).add_to(testmap)
+    city = gjf["city"][i]
+    grade = gjf["grade"][i]
+
+    #Playing with popups - ugly but works!
+    try:
+        pop_up = ("City: " + city + "\nGrade: " + grade)
+    except:
+        pop_up = ("City: " + city + "\nGrade: not available")
+
+    folium.GeoJson(zone, color=grade_color, weight=1, fill_opacity=0.5, popup = folium.Popup(pop_up)).add_to(testmap)
 
 #for i in range( len( gjf["geometry"] ) ):
 #    if gjf["city"][i] == "Colorado Springs":
