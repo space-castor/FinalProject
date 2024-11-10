@@ -14,7 +14,8 @@ def preprocess():
     https://www.geeksforgeeks.org/python-loop-through-folders-and-files-in-directory/
     '''
     files = []
-    values = ["RISK_VALUE", "TRACTFIPS"]
+    values = ["RISK_SCORE", "TRACTFIPS", "CFLD_RISKS", "HWAV_RISKS", "HRCN_RISKS",
+    "RFLD_RISKS", "TRND_RISKS", "WFIR_RISKS"]
     fema_dir = "FEMA_data/"
     for fema in os.listdir(fema_dir):
         files.append(fema_dir + fema)
