@@ -13,7 +13,7 @@ def fema_df():
     https://www.geeksforgeeks.org/python-loop-through-folders-and-files-in-directory/
     '''
     files = []
-    #"CWAV_RISKS", "HWAV_RISKS", "HRCN_RISKS", "RFLD_RISKS", "TRND_RISKS", "WFIR_RISKS"
+    #"CFLD_RISKS", "HWAV_RISKS", "HRCN_RISKS", "RFLD_RISKS", "TRND_RISKS", "WFIR_RISKS"
     values = ["RISK_SCORE", "TRACTFIPS"]
     fema_dir = "FEMA_data/"
     for fema in os.listdir(fema_dir):
