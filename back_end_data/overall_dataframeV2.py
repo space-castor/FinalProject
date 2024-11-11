@@ -55,13 +55,14 @@ def preprocess(fema_data, mapping_data):
     overall = pd.merge(grades, risks, on="area")
     return overall
 
-t0 = time.time()
-output = preprocess(fema_df(), mapping_df())
-t1= time.time()
-pd.set_option("display.max_rows", None)
+if __name__ == "__main__":
+    t0 = time.time()
+    output = preprocess(fema_df(), mapping_df())
+    t1= time.time()
+    pd.set_option("display.max_rows", None)
 
-#print(output.head)
-#print(output.columns)
+    print(output.head)
+    print(output.columns)
 
-#print(output["state"])
-print(t1-t0)
+    print(output["state"])
+    print(t1-t0)
