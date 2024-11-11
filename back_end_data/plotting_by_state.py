@@ -95,4 +95,4 @@ print("states are: ")
 print(states)
 
 for st in states:
-    makeplot(st,"CFLD_RISKS", output)
+    makeplot(st,"RISK_SCORE", output)
