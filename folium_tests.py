@@ -18,14 +18,25 @@ for i in range( len( gjf["geometry"] ) ):
     grade_color = gjf["fill"][i]
     city = gjf["city"][i]
     grade = gjf["grade"][i]
+    category = gjf["category"][i]
 
     #Playing with popups - ugly but works!
     try:
-        pop_up = ("City: " + city + "\nGrade: " + grade)
+        text = ("City: " + city + "\nGrade: " + grade + "\nCategory: " + category)
     except:
-        pop_up = ("City: " + city + "\nGrade: not available")
+        text = ("City: " + city + "\nGrade: not available")
 
-    folium.GeoJson(zone, color=grade_color, weight=1, fill_opacity=0.5, popup = folium.Popup(pop_up)).add_to(testmap)
+    popup = folium.Popup(text, lazy = True)
+
+    #Hovering stuffs
+    try:
+        hover_txt = ("\nCategory: " + category)
+    except:
+        hover_txt = ("Category not available")
+
+    tooltip = folium.Tooltip(hover_txt)
+
+    folium.GeoJson(zone, color=grade_color, weight=1, fill_opacity=0.5, popup = popup, tooltip = tooltip).add_to(testmap)
 
 #for i in range( len( gjf["geometry"] ) ):
 #    if gjf["city"][i] == "Colorado Springs":

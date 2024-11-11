@@ -47,10 +47,10 @@ def preprocess(fema_data, mapping_data):
 
     risks = fema_data.rename(columns={"TRACTFIPS": "area"})
     print("risk shape")
-    print(risks)
+    print(risks.shape)
     grades = mapping_data.rename(columns={"GEOID": "area"}).dropna()
     print("grades shape")
-    print(grades)
+    print(grades.shape)
 
     overall = pd.merge(grades, risks, on="area")
     return overall
