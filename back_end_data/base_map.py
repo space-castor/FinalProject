@@ -4,24 +4,23 @@ import branca
 import requests
 import io
 from risk_by_state import *
+
+# MAIN DATA FILE
 # pulls method to create the dataframe from risk_by_state to be accessible to this file
 overall, num_states  = preprocess()
 
-#checking to make sure everything pulled correctly
-print(overall.head())
-# setting up the base of the mapping_overall
-
 # COLOR FUNCTIONS / DICTIONARIES
+
 # sets up a color dictionary associated with the different scores
 # referenced from foliums user guide on geojson popups and tooltips
-'''
-colormap = branca.colormap.LinearColormap(
+climate_map = branca.colormap.LinearColormap(
     vmin=overall["RISK_SCORE"].quantile(0.0),
     vmax=overall["RISK_SCORE"].quantile(1),
     colors=["orange", "yellow", "lightblue", "blue"],
     caption= "Areas Climate Risk Score",
 )
 
+'''
 def color_risk(value):  # scalar value defined in 'column'
     if value == "HWAV_RISKS":
         return "#00bf7d"
@@ -39,11 +38,9 @@ def color_risk(value):  # scalar value defined in 'column'
         return "white"
 '''
 
-# --------- COUNTRY LEVEL -----------
-# individual states highlighted
-# map of the main us states - referenced from folium's user guide
+# GEOMETRY / TRANSLATION RESOURCES
 
-# states geometry
+# map of the main us states - referenced from folium's user guide
 refer = requests.get(
     "https://raw.githubusercontent.com/python-visualization/folium-example-data/main/us_states.json"
 ).json()
@@ -64,6 +61,9 @@ abbr = {
     "WA": "Washington", "WI": "Wisconsin", "WV": "West Virginia", "WY": "Wyoming"
 }
 
+# --------- COUNTRY LEVEL -----------
+# individual states highlighted - generalized entire country
+
 # since not every state is in the dataframe, this felt the most intuitive to me to prevent errors
 cv_df = []
 state_list = overall["state"].unique()
@@ -74,10 +74,10 @@ for st in state_list:
     state_dict["geometry"] = states_plot["geometry"][index]
     cv_df.append(state_dict)
 
-# revconvert into data frame
+# reconvert into data frame
 cv_df = gpd.GeoDataFrame(cv_df, crs="EPSG:4326")
-print(cv_df.shape)
 
+# Base Map Set Up / Country Level Information
 base = cv_df.explore(
     column = "max",  # make choropleth based on "max" column
     scheme = "Quantiles",
@@ -89,7 +89,30 @@ base = cv_df.explore(
     name="country_view",  # name of the layer in the map
 )
 
-# statesmerge = states.merge(state_risk_scores, how="left", left_on="name", right_on="name")]
+# --------- STATE LEVEL -----------
+# personalized ->  generated at the user input
+# temporary function to only pull up state data -> to be replaced with preprocess method with state parameter
+def pull(state, state_list):
+    try:
+        if state in state_list:
+            raise IndexError
+        new_state = folium.GeoJson(
+            overall[(overall["state"] == state)],
+            style_function=lambda x: {
+                "fillColor": climate_map(x["properties"]["RISK_SCORE"])
+                if x["properties"]["RISK_SCORE"] is not None
+                else "transparent",
+                "color": "black",
+                "fillOpacity": 0.4,
+            },
+            smooth_factor = 1.0,
+            name = state,
+            zoom_on_click = True
+        ).add_to(base)
+    except IndexError:
+        print(state + " has already been added to your map.")
+
+
 '''
 # ---- STATE LEVEL --------
 city_risks = overall.groupby(["city"], as_index = False)["RISK_SCORE"].mean()
@@ -106,18 +129,6 @@ g = folium.GeoJson(
     }
 ).add_to(base)
 '''
-# temporary function to only pull up state data -> to be replaced with preprocess method with state parameter
-def pull(state):
-    g = folium.GeoJson(
-        overall.filter(lambda x: x["state"] == state),
-        style_function=lambda x: {
-            "fillColor": colormap(x["properties"]["RISK_SCORE"])
-            if x["properties"]["RISK_SCORE"] is not None
-            else "transparent",
-            "color": "black",
-            "fillOpacity": 0.4,
-        }
-    ).add_to(base)
 """ processing everything
 g = folium.GeoJson(
     overall,
@@ -130,11 +141,53 @@ g = folium.GeoJson(
     }
 ).add_to(base)"""
 
-#colormap.add_to(base)
+climate_map.add_to(base)
 
 base.fit_bounds( [(25,-125), (50,-70)] )
 folium.TileLayer("CartoDB positron", show=False).add_to(
     base
 )  # use folium to add alternative tiles
 folium.LayerControl().add_to(base)  # use folium to add layer control
-base.save("base_map.html")
+
+# --------- USER INTERACTION ----------
+
+def help():
+    print("This program will create and export a map with informaiton analyzing the connection between redlining and climate impact.")
+    print("\t'add': add a new state")
+    print("\t'see': see all states added")
+    print("\t'export': view map as html file")
+    print("\t'quit': exit the program\n")
+
+def userInteract():
+    states = []
+    # variable to keep track of whether we're finished
+    done = False
+
+    while not done:
+    # prompt user for what action they would like to take
+        action = input("What action would you like to take? ('help' for options): ")
+
+        if action == "help":
+            help()
+
+        if action == "add":
+            state = input("Okay! What state would you like to add? (abbreviations please!) ")
+            pull(state, states)
+            states.append(state)
+
+        if action == "see":
+            print("The following states added are : " +  states)
+
+        if action == "export":
+            file_name = input("Okay! What would you like to name your file? ")
+            base.save((file_name + ".html"))
+
+        # not an infinite loop!
+        if action == "quit":
+            done = True
+            print("Okay! Thanks, come again later!")
+
+# --- Actually running the code -------
+
+print("Alrighty! We're ready for you!")
+userInteract()
