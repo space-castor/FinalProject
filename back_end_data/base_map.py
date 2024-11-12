@@ -88,6 +88,7 @@ base = cv_df.explore(
 #    legend_kwds=dict(colorbar=False),  # do not use colorbar
     name="country_view",  # name of the layer in the map
 )
+climate_map.add_to(base)
 
 # --------- STATE LEVEL -----------
 # personalized ->  generated at the user input
@@ -103,14 +104,17 @@ def pull(state, state_list):
                 if x["properties"]["RISK_SCORE"] is not None
                 else "transparent",
                 "color": "black",
-                "fillOpacity": 0.4,
+                "fillOpacity": 0.7,
             },
+            control = True,
             smooth_factor = 1.0,
             name = state,
             zoom_on_click = True
         ).add_to(base)
     except IndexError:
         print(state + " has already been added to your map.")
+    except:
+        print("We do not have " + state + " as a valid state abbreviations.")
 
 
 '''
@@ -141,14 +145,13 @@ g = folium.GeoJson(
     }
 ).add_to(base)"""
 
-climate_map.add_to(base)
-
 base.fit_bounds( [(25,-125), (50,-70)] )
 folium.TileLayer("CartoDB positron", show=False).add_to(
     base
 )  # use folium to add alternative tiles
+'''
 folium.LayerControl().add_to(base)  # use folium to add layer control
-
+'''
 # --------- USER INTERACTION ----------
 
 def help():
@@ -176,10 +179,11 @@ def userInteract():
             states.append(state)
 
         if action == "see":
-            print("The following states added are : " +  states)
+            print("The following states added are : " +  str(states))
 
         if action == "export":
             file_name = input("Okay! What would you like to name your file? ")
+            folium.LayerControl().add_to(base)  # use folium to add layer control
             base.save((file_name + ".html"))
 
         # not an infinite loop!
