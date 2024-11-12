@@ -61,7 +61,7 @@ if __name__ == "__main__":
     t1= time.time()
     pd.set_option("display.max_rows", None)
 
-    print(output.head)
+    print(output.head())
     print(output.columns)
 
     print(output["state"])

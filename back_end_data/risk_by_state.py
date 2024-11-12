@@ -83,26 +83,27 @@ def findmax(state, overall):
             state_dict["max"] = factor
     return state_dict
 
+# for checking elapsed time when running in risk_by_state.py
+if __name__ == "__main__":
+    t0 = time.time()
+    output, num_states = preprocess()
+    t1= time.time()
+    #print(output.head)
+    print("created the data frame! It has:")
+    print(output.columns)
+    print("this took: ")
+    print(t1-t0)
 
-t0 = time.time()
-output, num_states = preprocess()
-t1= time.time()
-#print(output.head)
-print("created the data frame! It has:")
-print(output.columns)
-print("this took: ")
-print(t1-t0)
+    states = output["state"].unique()
+    print(num_states, len(states))
+    print("states are: ")
+    print(states)
 
-states = output["state"].unique()
-print(num_states, len(states))
-print("states are: ")
-print(states)
-
-max_risks = {}
-for st in states:
-    #data is a dict returing data for each state for display
-    data = findmax(st, output)
-    print(st)
-    print(data)
-    max_risks[st] = data
-#print(max_risks)
+    max_risks = {}
+    for st in states:
+        #data is a dict returing data for each state for display
+        data = findmax(st, output)
+        print(st)
+        print(data)
+        max_risks[st] = data
+    #print(max_risks)
